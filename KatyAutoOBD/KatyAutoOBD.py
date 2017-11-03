@@ -15,6 +15,7 @@ str_coolant_temp = '0'
 str_fuel_level = '0'
 str_engine_load = '0'
 str_oil_temp = '0'
+str_fuel_type = '0'
 
 def parseAuto():
     global str_rpm, str_speed, str_coolant_temp, str_fuel_level
