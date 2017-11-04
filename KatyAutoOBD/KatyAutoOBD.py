@@ -100,7 +100,10 @@ def about():
 ### Thread Management
 
 def start_thread(event):
-    global thread
+    global thread, indicator
+    
+    indicator = 0
+    
     thread = threading.Thread(target=parseAuto)
     thread.daemon = True
     
