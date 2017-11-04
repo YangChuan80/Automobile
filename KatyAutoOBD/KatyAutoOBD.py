@@ -13,11 +13,13 @@ str_rpm = '0'
 str_speed = '0'
 str_coolant_temp = '0'
 str_fuel_level = '0'
+str_intake_temp = '0'
+str_throttle_pos = '0'
 
 indicator = 0
 
 def parseAuto():
-    global str_rpm, str_speed, str_coolant_temp, str_fuel_level, indicator
+    global str_rpm, str_speed, str_coolant_temp, str_fuel_level, str_intake_temp, str_throttle_pos, indicator
     
     while(1):
         
@@ -29,7 +31,10 @@ def parseAuto():
         cmd_rpm = obd.commands.RPM
         cmd_speed = obd.commands.SPEED
         cmd_coolant_temp = obd.commands.COOLANT_TEMP
-        cmd_fuel_level = obd.commands.FUEL_LEVEL        
+        cmd_fuel_level = obd.commands.FUEL_LEVEL
+        
+        cmd_intake_temp = obd.commands.INTAKE_TEMP
+        cmd_throttle_pos = obd.commands.THROTTLE_POS
         
         # Assignment of Values to Varible 'Response'
         response_rpm = connection.query(cmd_rpm)
@@ -37,11 +42,17 @@ def parseAuto():
         response_coolant_temp = connection.query(cmd_coolant_temp)
         response_fuel_level = connection.query(cmd_fuel_level)  
         
+        response_intake_temp = connection.query(cmd_intake_temp)
+        response_throttle_pos = connection.query(cmd_throttle_pos)
+        
         # Change Obj to String
         str_rpm = str(response_rpm.value)
         str_speed = str(response_speed.value)
         str_coolant_temp = str(response_coolant_temp.value)
         str_fuel_level = str(response_fuel_level.value)   
+        
+        str_intake_temp = str(response_intake_temp.value)   
+        str_throttle_pos = str(response_throttle_pos.value)   
         
         # Delay Parsing Time
         time.sleep(0.01) 
@@ -79,8 +90,7 @@ def about():
     label_author.place(x=225,y=180)
     
     label_author=tk.Label(about_root,text='Shengjing Hospital of China Medical University', font=('tahoma', 22))
-    label_author.place(x=100,y=240)
-   
+    label_author.place(x=100,y=240)   
 
     button_refresh=tk.Button(about_root, width=15, text='OK', font=('tahoma', 24), command=about_root.destroy)
     button_refresh.place(x=230, y=330)
@@ -95,13 +105,18 @@ def start_thread(event):
     thread.daemon = True
     
     text_rpm.delete('1.0', tk.END)
-    text_rpm.insert('1.0', str(str_rpm))
+    text_rpm.insert('1.0', str_rpm)
     text_speed.delete('1.0', tk.END)
-    text_speed.insert('1.0', str(str_speed))
+    text_speed.insert('1.0', str_speed)
     text_coolant_temp.delete('1.0', tk.END)
-    text_coolant_temp.insert('1.0', str(str_coolant_temp))
+    text_coolant_temp.insert('1.0', str_coolant_temp)
     text_fuel_level.delete('1.0', tk.END)
-    text_fuel_level.insert('1.0', str(str_fuel_level))    
+    text_fuel_level.insert('1.0', str_fuel_level)    
+    
+    text_intake_temp.delete('1.0', tk.END)
+    text_intake_temp.insert('1.0', str_intake_temp)    
+    text_throttle_pos.delete('1.0', tk.END)
+    text_throttle_pos.insert('1.0', str_throttle_pos)    
  
     thread.start()
     root.after(20, check_thread)
@@ -109,14 +124,19 @@ def start_thread(event):
 def check_thread():
     if thread.is_alive():
         text_rpm.delete('1.0', tk.END)
-        text_rpm.insert('1.0', str(str_rpm))
+        text_rpm.insert('1.0', str_rpm)
         text_speed.delete('1.0', tk.END)
-        text_speed.insert('1.0', str(str_speed))
+        text_speed.insert('1.0', str_speed)
         text_coolant_temp.delete('1.0', tk.END)
-        text_coolant_temp.insert('1.0', str(str_coolant_temp))
+        text_coolant_temp.insert('1.0', str_coolant_temp)
         text_fuel_level.delete('1.0', tk.END)
-        text_fuel_level.insert('1.0', str(str_fuel_level))  
-     
+        text_fuel_level.insert('1.0', str_fuel_level)    
+
+        text_intake_temp.delete('1.0', tk.END)
+        text_intake_temp.insert('1.0', str_intake_temp)    
+        text_throttle_pos.delete('1.0', tk.END)
+        text_throttle_pos.insert('1.0', str_throttle_pos)    
+        
         root.after(20, check_thread)    
 
 ### TKinter Mainflow
@@ -131,7 +151,7 @@ root.title('Katy OBD -- On Board Diagnostics Parser')
 y0 = 150
 y1 = 400
 y2 = 580
-y3 = 670
+y3 = 690
 
 # Label & Edit Box
 
@@ -158,6 +178,20 @@ label_fuel_level = tk.Label(root, text='Fuel Level', font=('tahoma', 30))
 label_fuel_level.place(x=650,y=y1-80)
 label_fuel_level_percentage = tk.Label(root, text='%', font=('tahoma', 40))
 label_fuel_level_percentage.place(x=1200,y=y1)
+
+# ////////////////////////////////////
+
+text_intake_temp = tk.Text(root, width=10, height=1, font=('tahoma', 30), bd=2, wrap='none')
+text_intake_temp.place(x=50, y=y2)
+label_intake_temp = tk.Label(root, text='Intake Air Temperature', font=('tahoma', 25))
+label_intake_temp.place(x=50,y=y2-70)
+
+text_throttle_pos = tk.Text(root, width=10, height=1, font=('tahoma', 30), bd=2, wrap='none')
+text_throttle_pos.place(x=550, y=y2)
+label_throttle_pos = tk.Label(root, text='Throttle Position', font=('tahoma', 25))
+label_throttle_pos.place(x=550,y=y2-70)
+label_throttle_pos_percentage = tk.Label(root, text='%', font=('tahoma', 30))
+label_throttle_pos_percentage.place(x=820,y=y2)
 
 # Buttons
 
