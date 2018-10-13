@@ -106,6 +106,9 @@ def display_in_text(item):
     text_VIN.delete('1.0', tk.END)
     text_VIN.insert('1.0', item['VIN']) 
     
+    text_comments.delete('1.0', tk.END)
+    text_comments.insert('1.0', item['Comments']) 
+    
     # ////////////////////////////
     
     text_WMI.delete('1.0', tk.END)
@@ -405,6 +408,21 @@ def decode():
         except:            
             messagebox.showwarning("Invalid VIN", "Sorry, the VIN you input is invalid. Please check!")  
 
+def search():
+    VIN_search_gotten = text_VIN_search.get('1.0', tk.END).rstrip()
+    
+    sqlstr = 'SELECT * FROM VIN WHERE VIN.VIN = ? '
+    cur.execute(sqlstr, (VIN_search_gotten,))
+    spreadsheet = cur.fetchall()
+    
+    combination = []
+    
+    for row_tuple in spreadsheet:
+        combination.append(list(row_tuple[:6]) + list(row_tuple[6]) + list(row_tuple[7:]))
+    
+    clear()
+    display_in_table(combination)
+
 def about():
     messagebox.showinfo("About", "Author: Chuan Yang")
 
@@ -414,7 +432,7 @@ root = tk.Tk()
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 #root.attributes('-fullscreen', True)
 root.title('Gessner VIN')
-#root.iconbitmap('CharlestonParkIcon.ico')
+root.iconbitmap('GessnerIcon.ico')
 
 ### Table Control
 
@@ -423,15 +441,17 @@ headers = ['id', 'Brand', 'Make', 'Color', 'Body Style', 'Engine',
            '6', '7', '8', '9', '10', 
            '11', '12', '13', '14', '15', 
            '16', '17', 'Comments']
-header_widths = [10, 80, 100, 60, 60, 80,
-                 30, 30, 60, 30, 30, 
-                 30, 30, 30, 60, 30, 
-                 60, 30, 30, 30, 30, 
-                 30, 30, 40]
+header_widths = [10, 200, 100, 50, 30, 100,
+                 20, 20, 50, 20, 20, 
+                 20, 20, 20, 50, 20, 
+                 20, 20, 20, 20, 20, 
+                 20, 20, 40]
 
-# Multicolumn Listbox/////////////////////////////////////////////////////////////////////////////
+# /////////////////Multicolumn Listbox//////////////////////////////////////////////
+# ipadx and ipady are diameters.
+
 table = ttk.Treeview(root, height="20", columns=headers, selectmode="extended")
-table.pack(padx=10, pady=20, ipadx=1200, ipady=200)
+table.pack(padx=10, pady=20, ipadx=1200, ipady=185)
 
 i = 1
 for header in headers:
@@ -459,18 +479,25 @@ y_origin = 560
 gain = 60
 i = 0
 
+# ///////////// Raised Label Block ////////////////////////////////////////////////
+
+label_frame = tk.Label(root,width=216, height=9 , relief='raised', borderwidth=1)
+label_frame.place(x=10,y=y_origin+i*gain-40)
+
+# ////////////// Text Editor /////////////////////////////
+
 text_id = tk.Text(root, width=3, height=1, font=('tahoma', 8), wrap='none')
 text_id.place(x= 40, y= y_origin + i * gain)
 
-text_brand = tk.Text(root, width=30, height=1, font=('tahoma', 8), wrap='none')
+text_brand = tk.Text(root, width=40, height=1, font=('tahoma', 8), wrap='none')
 text_brand.place(x= 90, y= y_origin + i * gain)
 label_brand = tk.Label(root, text='Brand:', font=('tahoma', 8))
 label_brand.place(x = 90, y = y_origin + i * gain - 25)
 
-text_make = tk.Text(root, width=35, height=1, font=('tahoma', 8), wrap='none')
-text_make.place(x= 320, y= y_origin + i * gain)
+text_make = tk.Text(root, width=25, height=1, font=('tahoma', 8), wrap='none')
+text_make.place(x= 370, y= y_origin + i * gain)
 label_make = tk.Label(root, text='Make:', font=('tahoma', 8))
-label_make.place(x = 320, y = y_origin + i * gain - 25)
+label_make.place(x = 370, y = y_origin + i * gain - 25)
 
 text_color = tk.Text(root, width=15, height=1, font=('tahoma', 8), wrap='none')
 text_color.place(x= 580, y= y_origin + i * gain)
@@ -488,9 +515,9 @@ label_engine = tk.Label(root, text='Engine:', font=('tahoma', 8))
 label_engine.place(x = 950, y = y_origin + i * gain - 25)
 
 text_VIN = tk.Text(root, width=45, height=1, font=('tahoma', 8), wrap='none')
-text_VIN.place(x=1220, y= y_origin + i * gain)
+text_VIN.place(x=1210, y= y_origin + i * gain)
 label_VIN = tk.Label(root, text='VIN:', font=('tahoma', 8))
-label_VIN.place(x=1220,y= y_origin + i * gain - 25)
+label_VIN.place(x=1210,y= y_origin + i * gain - 25)
 
 i = 1
 
@@ -557,19 +584,27 @@ label_model.place(x=990,y=y_origin + i * gain-30)
 # New
 
 button_new = ttk.Button(root, text='New...', width=20, command=new)
-button_new.place(x=30, y=485)
+button_new.place(x=30, y=465)
 
 # Delete
 button_delete = ttk.Button(root, text='Delete', width=20, command=delete)
-button_delete.place(x=1100, y=485)
+button_delete.place(x=1100, y=465)
 
 # Browse
 
 text_num = tk.Text(root, width=8, height=1, font=('tahoma', 8), wrap='none')
-text_num.place(x=1300, y=490)
+text_num.place(x=1300, y=465)
 
 button_browse=ttk.Button(root, text='Browse', width=15, command=browse)
-button_browse.place(x=1380, y=485)
+button_browse.place(x=1380, y=465)
+
+# Search
+
+text_VIN_search = tk.Text(root, width=30, height=1, font=('tahoma', 8), wrap='none')
+text_VIN_search.place(x=600, y=469)
+
+button_search=ttk.Button(root, text='Search', width=20, command=search)
+button_search.place(x=820, y=465)
 
 # Update
 
